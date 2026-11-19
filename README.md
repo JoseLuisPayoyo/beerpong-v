@@ -14,7 +14,7 @@ npm run dev
 
 | Archivo | Qué es |
 | --- | --- |
-| `src/lib/v.ts` | Fecha del torneo, `FECHA_CONFIRMADA`, `URL_IV` y datos de la IV |
+| `src/lib/v.ts` | Fecha del torneo, `FECHA_CONFIRMADA`, edición y URL del sitio |
 | `src/pages/index.astro` | La página |
 | `src/components/v/` | La V de vasos y el formulario de sugerencias |
 | `src/scripts/v.ts` | La pelota, la tiza y (con fecha) la cuenta atrás |

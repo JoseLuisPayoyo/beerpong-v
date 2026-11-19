@@ -16,18 +16,3 @@ export const FECHA_PROVISIONAL = ['AGOSTO', '2027'] as const;
 export const EDICION = 5;
 
 export const SITIO = 'https://elperezyesos.com';
-
-// La web de la edición anterior (IV), a la que lleva el acceso discreto.
-export const URL_IV = 'https://iv.elperezyesos.com';
-
-// Así fue la IV (2026): lo que se cuenta en ese acceso.
-export const IV = {
-  campeones: 'De Rodríguez',
-  final: '7–6',
-  equipos: 51,
-  vasos: 1063,
-};
-
-// 1063 → «1.063» (es-ES no agrupa los millares de cuatro cifras si no se le pide)
-export const miles = (n: number) =>
-  new Intl.NumberFormat('es-ES', { useGrouping: 'always' }).format(n);

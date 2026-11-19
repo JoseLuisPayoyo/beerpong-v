@@ -120,7 +120,7 @@ body {
   justify-content: space-between;
   gap: clamp(8px, 2svh, 24px);
 }
-/* al bajar: la sugerencia y el acceso a la IV */
+/* al bajar: la sugerencia */
 .banda {
   display: flex;
   flex-direction: column;
@@ -131,8 +131,7 @@ body {
 
 /* los textos que pisan el eje lo interrumpen */
 .firma,
-.fecha,
-.archivo {
+.fecha {
   background: var(--mesa);
   padding: 0.2em 0.8em;
 }
@@ -407,42 +406,13 @@ body {
   }
 }
 
-/* ---------- acceso a la IV ---------- */
-.archivo {
-  display: block;
-  max-width: 31em;
-  font-size: 13px;
-  text-align: center;
-  text-decoration: none;
-  color: rgba(246, 241, 227, 0.8);
-  border-radius: 6px;
-  transition: color 160ms ease;
-}
-.archivo b {
-  font-weight: 600;
-  color: var(--linea);
-  text-decoration: underline;
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 3px;
-}
-.archivo:focus-visible {
-  outline: 2px solid var(--linea);
-  outline-offset: 4px;
-}
-@media (hover: hover) and (pointer: fine) {
-  .archivo:hover {
-    color: var(--linea);
-  }
-}
-
 /* ---------- escritorio ---------- */
 @media (min-width: 900px) {
   body {
     font-size: 16px;
   }
   .firma,
-  .unidad,
-  .archivo {
+  .unidad {
     font-size: 14px;
   }
   .fecha {

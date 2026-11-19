@@ -6,7 +6,7 @@ import '../styles/v.css';
 import Analytics from '@vercel/analytics/astro';
 import Vasos from '../components/v/Vasos.astro';
 import Sugerencia from '../components/v/Sugerencia.astro';
-import { FECHA_CONFIRMADA, FECHA_PROVISIONAL, FECHA_TORNEO, IV, SITIO, URL_IV, miles } from '../lib/v';
+import { FECHA_CONFIRMADA, FECHA_PROVISIONAL, FECHA_TORNEO, SITIO } from '../lib/v';
 
 // Fuentes self-hosteadas (solo el subconjunto latin, que cubre el español).
 import rotuloUrl from '@fontsource/big-shoulders-display/files/big-shoulders-display-latin-900-normal.woff2?url';
@@ -78,8 +78,8 @@ const fechaLarga = `${dia.charAt(0).toUpperCase()}${dia.slice(1)}, a las ${hora}
     <meta name="twitter:image" content={og} />
 
     <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- el rótulo es lo más grande de la primera pantalla: su fuente, cuanto antes -->
@@ -140,11 +140,6 @@ const fechaLarga = `${dia.charAt(0).toUpperCase()}${dia.slice(1)}, a las ${hora}
 
         <div class="banda">
           <Sugerencia />
-
-          <a class="archivo" href={URL_IV}>
-            <b>Así fue la IV edición</b><br />
-            Campeones {IV.campeones}, {IV.final} en la final. {IV.equipos}&nbsp;equipos y {miles(IV.vasos)}&nbsp;vasos.
-          </a>
         </div>
       </main>
     </div>

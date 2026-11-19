@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Favicon V · propuestas</title>
+<style>
+  /* Colores del proyecto (src/styles/v.css y src/components/v/Vasos.astro) */
+  :root {
+    --mesa: #0f5540;      /* --mesa */
+    --linea: #f6f1e3;     /* --linea */
+    --rojo: #e8382b;      /* g-cuerpo, tono principal del vaso */
+    --rojo-boca: #b72217; /* boca del vaso */
+    --rojo-hondo: #78110a;/* sombra del cuerpo */
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 16px 64px;
+    font: 15px/1.45 system-ui, sans-serif;
+    background: #ecebe6; color: #1d1d1b;
+  }
+  main { max-width: 1040px; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .intro { margin: 0 0 32px; color: #55534c; max-width: 62ch; }
+  section {
+    background: #fff; border-radius: 14px; padding: 22px 22px 26px;
+    margin-bottom: 26px; box-shadow: 0 1px 2px rgba(0,0,0,.06);
+  }
+  h2 { font-size: 19px; margin: 0 0 2px; }
+  .nota { margin: 0 0 18px; color: #55534c; max-width: 70ch; }
+  .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fondo { border-radius: 10px; padding: 18px; display: flex; align-items: flex-end; gap: 22px; flex-wrap: wrap; }
+  .claro { background: #f7f7f5; border: 1px solid #e3e2dc; }
+  .oscuro { background: #1f2023; color: #c9c9c9; }
+  figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  figcaption { font-size: 11px; opacity: .7; }
+  canvas.px { width: 64px; height: 64px; image-rendering: pixelated; border-radius: 4px; }
+  .pestanas { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+  .barra { border-radius: 10px; padding: 8px 8px 0; display: flex; gap: 2px; overflow: hidden; }
+  .barra.claro { background: #dee1e6; border: 0; }
+  .barra.oscuro { background: #202124; }
+  .tab {
+    display: flex; align-items: center; gap: 8px; min-width: 0; flex: 0 1 230px;
+    height: 34px; padding: 0 12px; border-radius: 8px 8px 0 0; font-size: 12px;
+    white-space: nowrap;
+  }
+  .tab span { overflow: hidden; text-overflow: ellipsis; }
+  .tab img { width: 16px; height: 16px; flex: none; }
+  .barra.claro .tab.activa { background: #fff; color: #1f1f1f; }
+  .barra.oscuro .tab.activa { background: #35363a; color: #e8eaed; }
+  .barra.claro .tab:not(.activa) { color: #45474a; }
+  .barra.oscuro .tab:not(.activa) { color: #9aa0a6; }
+  .otro { width: 16px; height: 16px; border-radius: 50%; background: #9aa0a6; flex: none; }
+  @media (max-width: 760px) { .fila, .pestanas { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Favicon de la V · tres propuestas</h1>
+  <p class="intro">
+    Solo los colores del proyecto: verde mesa <code>#0f5540</code>, línea/pelota <code>#f6f1e3</code> y
+    los rojos del vaso (<code>#e8382b</code>, <code>#b72217</code>, <code>#78110a</code>).
+    Cada variante a 16, 32, 64 y 180 px. La casilla «16 · 1×» es el icono rasterizado a 16×16 píxeles
+    reales y ampliado sin suavizar: así se ve en una pantalla normal, sin retina.
+  </p>
+  <div id="propuestas"></div>
+</main>
+
+<script>
+  const MESA = '#0f5540', LINEA = '#f6f1e3', ROJO = '#e8382b', BOCA = '#b72217', HONDO = '#78110a';
+  const fondo = `<rect width="100" height="100" rx="22" fill="${MESA}"/>`;
+
+  const variantes = [
+    {
+      id: 'a',
+      titulo: 'A · La V de vasos',
+      nota: 'Cinco vasos vistos desde arriba en formación de V (la de la página tiene nueve: a 16 px no caben), con la pelota en el de la punta. Es la imagen de la página resumida.',
+      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${fondo}
+        <g fill="${ROJO}">
+          <circle cx="20" cy="24" r="12.5"/><circle cx="80" cy="24" r="12.5"/>
+          <circle cx="35" cy="50" r="12.5"/><circle cx="65" cy="50" r="12.5"/>
+          <circle cx="50" cy="76" r="12.5"/>
+        </g>
+        <circle cx="50" cy="76" r="6" fill="${LINEA}"/>
+      </svg>`,
+    },
+    {
+      id: 'b',
+      titulo: 'B · El vaso y la pelota',
+      nota: 'Un solo vaso rojo de perfil, con la boca abierta y la pelota entrando. Forma grande y maciza: es la que mejor aguanta los 16 px, pero pierde la «V».',
+      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${fondo}
+        <path d="M19 38 L31 87 Q50 93 69 87 L81 38 Z" fill="${ROJO}"/>
+        <path d="M24 58 Q50 66 76 58 L75 63 Q50 71 25 63 Z" fill="${BOCA}"/>
+        <ellipse cx="50" cy="38" rx="31" ry="10" fill="${BOCA}"/>
+        <ellipse cx="50" cy="38.5" rx="25" ry="6.5" fill="${HONDO}"/>
+        <circle cx="50" cy="27" r="13" fill="${LINEA}"/>
+        <path d="M19 38 Q50 54 81 38 Q50 50 19 38 Z" fill="${ROJO}"/>
+      </svg>`,
+    },
+    {
+      id: 'c',
+      titulo: 'C · La V pintada en la mesa',
+      nota: 'Una V condensada y gorda como la letra de BEERPONG (Big Shoulders 900), en el blanco de las líneas, con el eje central de la mesa cruzando de arriba abajo y una pelota roja cayendo en el hueco: el rojo la ata a los vasos.',
+      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${fondo}
+        <rect x="47.5" y="0" width="5" height="100" fill="${LINEA}" opacity=".55"/>
+        <path d="M17 15 L39 15 L50 60 L61 15 L83 15 L63.5 87 L36.5 87 Z" fill="${LINEA}"/>
+        <circle cx="50" cy="25" r="8.5" fill="${ROJO}"/>
+      </svg>`,
+    },
+  ];
+
+  const url = (svg) => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+
+  function bloque(v, tono) {
+    const tams = [16, 32, 64, 180];
+    return `<div class="fondo ${tono}">
+      <figure><canvas class="px" width="16" height="16" data-src="${v.id}"></canvas><figcaption>16 · 1×</figcaption></figure>
+      ${tams.map((t) => `<figure><img src="${url(v.svg)}" width="${t}" height="${t}" alt=""><figcaption>${t} px</figcaption></figure>`).join('')}
+    </div>`;
+  }
+
+  function pestana(v, tono) {
+    return `<div class="barra ${tono}">
+      <div class="tab activa"><img src="${url(v.svg)}" alt=""><span>Beerpong V · Agosto 2027 · Cabra del Santo Cristo</span></div>
+      <div class="tab"><i class="otro"></i><span>Bandeja de entrada</span></div>
+      <div class="tab"><i class="otro"></i><span>Mapas</span></div>
+    </div>`;
+  }
+
+  document.getElementById('propuestas').innerHTML = variantes.map((v) => `
+    <section>
+      <h2>${v.titulo}</h2>
+      <p class="nota">${v.nota}</p>
+      <div class="fila">${bloque(v, 'claro')}${bloque(v, 'oscuro')}</div>
+      <div class="pestanas">${pestana(v, 'claro')}${pestana(v, 'oscuro')}</div>
+    </section>`).join('');
+
+  // Rasterizado real a 16×16 (lo que ve una pantalla 1×)
+  for (const c of document.querySelectorAll('canvas[data-src]')) {
+    const v = variantes.find((x) => x.id === c.dataset.src);
+    const img = new Image();
+    img.onload = () => c.getContext('2d').drawImage(img, 0, 0, 16, 16);
+    img.src = url(v.svg);
+  }
+</script>
+</body>
+</html>

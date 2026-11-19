@@ -1,5 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="22" fill="#ec3a2c"/>
-  <rect x="24" y="29" width="13" height="45" rx="1.5" fill="#f7efe2"/>
-  <path d="M44 29 L55 29 L61.5 57 L68 29 L79 29 L61.5 74 Z" fill="#f7efe2"/>
+  <!-- Beerpong V: la V de BEERPONG (Big Shoulders Display 900, en trazado) pintada en la mesa, con el eje central y la pelota -->
+  <rect width="100" height="100" rx="22" fill="#0f5540"/>
+  <path d="M47.5 0h5v12h-5zM47.5 88h5v12h-5z" fill="#f6f1e3" opacity=".55"/>
+  <path d="M61.5 88L38.5 88L27.48 12L42.21 12L47.81 50.09L48.67 75.46L51.33 75.46L52.19 50.09L57.79 12L72.52 12L61.5 88Z" fill="#f6f1e3"/>
+  <circle cx="50" cy="16.84" r="7" fill="#e8382b"/>
 </svg>
