@@ -1,0 +1,34 @@
+---
+// Panel de administración de la V (modo CRM). Página estática con una isla
+// React que solo existe aquí: / no carga React ni nada del panel.
+// Todo va desde el navegador con la publishable key + la sesión del admin;
+// la seguridad la pone RLS en Supabase. Fuera de buscadores (noindex).
+import '@fontsource/bricolage-grotesque/latin-500';
+import '@fontsource/bricolage-grotesque/latin-600';
+import '@fontsource/bricolage-grotesque/latin-700';
+import '@fontsource/big-shoulders-display/latin-900';
+import '../admin/admin.css';
+import Panel from '../admin/Panel';
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Panel · Beerpong V</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  </head>
+  <body>
+    <Panel client:only="react">
+      <main class="portal" slot="fallback" aria-busy="true">
+        <p class="cargando" role="status"><span class="girar" aria-hidden="true"></span>Cargando el panel…</p>
+      </main>
+    </Panel>
+    <noscript><p class="sin-js">El panel necesita JavaScript.</p></noscript>
+  </body>
+</html>
