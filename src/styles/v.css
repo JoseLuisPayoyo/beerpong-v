@@ -1,0 +1,587 @@
+/*
+  Beerpong V — «La mesa» (la raíz de la web)
+  La pantalla es la mesa de ping-pong, verde, con sus líneas pintadas (lo fijo);
+  lo provisional y lo que escribe la gente va a tiza. La V son nueve vasos rojos
+  en formación; la pelota entra botando y cae en el de la punta.
+  Referencia visual: reference/v/v-a.html.
+
+  Las fuentes (@font-face) se declaran en el <head> de index.astro.
+*/
+:root {
+  --mesa: #0f5540;
+  --linea: #f6f1e3;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --margen: max(10px, env(safe-area-inset-left));
+  --rotulo: 'Big Shoulders Display', Impact, 'Arial Narrow', sans-serif;
+  --texto: 'Bricolage Grotesque', system-ui, sans-serif;
+  --tiza: 'Caveat Brush', 'Segoe Print', 'Bradley Hand', cursive;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--mesa);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--mesa);
+  color: var(--linea);
+  font-family: var(--texto);
+  font-size: 15px;
+  line-height: 1.35;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- la mesa ---------- */
+.tablero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* luz de tarde (entra por arriba a la izquierda) y el grano de la pintura del tablero */
+.tablero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 75% at 6% 0%, rgba(255, 246, 200, 0.16), transparent 62%),
+    radial-gradient(120% 90% at 100% 100%, rgba(0, 18, 12, 0.3), transparent 64%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* líneas pintadas: borde de la mesa y eje central */
+.lineas {
+  position: absolute;
+  inset: max(10px, env(safe-area-inset-top)) var(--margen) max(10px, env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+.borde {
+  position: absolute;
+  inset: 0;
+  border: 3px solid var(--linea);
+}
+.eje {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--linea);
+  opacity: 0.55;
+  transform-origin: 50% 0;
+}
+
+.campo {
+  --arriba: clamp(24px, 4svh, 44px);
+  position: relative;
+  flex: 1;
+  padding: var(--arriba) calc(var(--margen) + 12px) clamp(28px, 4.4svh, 44px);
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+/* primera pantalla: firma, BEERPONG, la V y la fecha */
+.portada {
+  min-height: calc(100svh - var(--arriba) - 26px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(8px, 2svh, 24px);
+}
+/* al bajar: la sugerencia y el acceso a la IV */
+.banda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(26px, 5svh, 44px);
+  padding-top: clamp(40px, 8svh, 72px);
+}
+
+/* los textos que pisan el eje lo interrumpen */
+.firma,
+.fecha,
+.archivo {
+  background: var(--mesa);
+  padding: 0.2em 0.8em;
+}
+
+.firma {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+/* ---------- BEERPONG V ---------- */
+.titulo {
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 2.2svh, 26px);
+  font-weight: 400;
+}
+
+/* pintado en la mesa: el eje central pasa justo entre BEER y PONG */
+.marca {
+  --fs: min(21vw, 14svh, 150px);
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--fs) * 0.15);
+  width: 100%;
+  font-family: var(--rotulo);
+  font-weight: 900;
+  font-size: var(--fs);
+  line-height: 0.84;
+  color: var(--linea);
+  white-space: nowrap;
+}
+.mitad {
+  flex: 1 1 0;
+  overflow: hidden;
+  padding-top: 0.04em;
+}
+/* BEER es más estrecha que PONG: se abre un pelín para que las dos mitades pesen parecido */
+.mitad.izq {
+  text-align: right;
+  letter-spacing: 0.042em;
+}
+.mitad.izq > span {
+  margin-right: -0.042em;
+}
+.mitad > span {
+  display: inline-block;
+}
+
+.uve {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: min(100%, 39svh * 1.205, 500px);
+  height: auto;
+  overflow: visible;
+}
+.copa {
+  cursor: pointer;
+}
+/* para animar con CSS dentro del SVG: cada pieza gira y escala sobre su propia caja */
+.copa,
+.sombra,
+#salpica {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+.copa {
+  transform-origin: 50% 100%;
+}
+/* «edición», a tiza, junto a la V */
+.tiza text {
+  font-family: var(--tiza);
+  font-size: 31px;
+  letter-spacing: 0.05em;
+  fill: var(--linea);
+}
+.tiza path {
+  fill: none;
+  stroke: var(--linea);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+/* ---------- la fecha: un recuadro pintado en la mesa ---------- */
+.cuenta,
+.sin-fecha {
+  --fs: min(12.6vw, 8.4svh, 62px);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+  max-width: 470px;
+  border: 2px solid var(--linea);
+}
+
+/* mientras no haya fecha: el mes pintado y, a tiza, que falta confirmarla */
+.sin-fecha {
+  --fs: min(13vw, 9svh, 66px);
+  position: relative;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 0 26px;
+  font-family: var(--rotulo);
+  font-weight: 900;
+  font-size: var(--fs);
+  line-height: 0.82;
+  text-align: center;
+}
+.sin-fecha .palabra {
+  display: block;
+  padding: 0.24em 0 0.2em;
+}
+.pendiente {
+  position: absolute;
+  right: 3%;
+  bottom: -1.02em;
+  font-family: var(--tiza);
+  font-weight: 400;
+  font-size: clamp(22px, 6.4vw, 28px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transform: rotate(-4deg);
+  filter: url(#f-tiza);
+}
+
+/* con fecha confirmada: la cuenta atrás, cuatro casillas */
+.celda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--fs) * 0.1);
+  padding: calc(var(--fs) * 0.2) 0 calc(var(--fs) * 0.17);
+  border-left: 2px solid rgba(246, 241, 227, 0.4);
+  min-width: 0;
+}
+/* la raya del medio es el propio eje de la mesa */
+.celda:first-child,
+.celda:nth-child(3) {
+  border-left-color: transparent;
+}
+.num {
+  display: flex;
+  justify-content: center;
+  font-family: var(--rotulo);
+  font-weight: 900;
+  font-size: var(--fs);
+  line-height: 0.82;
+}
+.num i {
+  font-style: normal;
+  display: block;
+  width: 0.535em;
+  text-align: center;
+}
+.unidad {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.fecha {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ---------- sugerencias: se escriben a tiza en la mesa ---------- */
+.sugerencia {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 470px;
+  background: var(--mesa);
+  padding: 6px 0;
+}
+.sug-titulo {
+  font-family: var(--tiza);
+  font-size: clamp(24px, 7vw, 30px);
+  line-height: 1.05;
+  text-align: center;
+  transform: rotate(-1.5deg);
+  filter: url(#f-tiza);
+  text-wrap: balance;
+}
+.sug-texto {
+  display: block;
+  width: 100%;
+  min-height: 112px;
+  resize: vertical;
+  margin: 0;
+  padding: 12px 14px;
+  border: 2px solid var(--linea);
+  border-radius: 0;
+  background: rgba(0, 24, 16, 0.3);
+  color: var(--linea);
+  font-family: var(--tiza);
+  font-size: 21px;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
+.sug-texto::placeholder {
+  color: rgba(246, 241, 227, 0.5);
+}
+.sug-texto:focus-visible,
+.sug-enviar:focus-visible {
+  outline: 2px solid var(--linea);
+  outline-offset: 3px;
+}
+
+/* campo trampa para bots: fuera de pantalla, pero presente (no display:none) */
+.trampa {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* el aviso del envío, a tiza */
+.sug-estado {
+  margin: 0;
+  font-family: var(--tiza);
+  font-size: clamp(22px, 6.4vw, 27px);
+  line-height: 1.1;
+  text-align: center;
+  transform: rotate(-1.5deg);
+  filter: url(#f-tiza);
+  text-wrap: balance;
+}
+.sug-estado:empty {
+  display: none;
+}
+
+.sug-enviar {
+  appearance: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0.5em 1em 0.42em;
+  background: var(--linea);
+  color: var(--mesa);
+  font-family: var(--rotulo);
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 160ms ease,
+    opacity 160ms ease;
+}
+.sug-enviar:active {
+  transform: scale(0.97);
+}
+.sug-enviar:disabled {
+  opacity: 0.6;
+  cursor: progress;
+  transform: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .sug-enviar:hover:not(:disabled) {
+    background: #fff;
+  }
+}
+
+/* ---------- acceso a la IV ---------- */
+.archivo {
+  display: block;
+  max-width: 31em;
+  font-size: 13px;
+  text-align: center;
+  text-decoration: none;
+  color: rgba(246, 241, 227, 0.8);
+  border-radius: 6px;
+  transition: color 160ms ease;
+}
+.archivo b {
+  font-weight: 600;
+  color: var(--linea);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+.archivo:focus-visible {
+  outline: 2px solid var(--linea);
+  outline-offset: 4px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .archivo:hover {
+    color: var(--linea);
+  }
+}
+
+/* ---------- escritorio ---------- */
+@media (min-width: 900px) {
+  body {
+    font-size: 16px;
+  }
+  .firma,
+  .unidad,
+  .archivo {
+    font-size: 14px;
+  }
+  .fecha {
+    font-size: 17px;
+  }
+  .lineas {
+    inset: 18px;
+  }
+}
+
+/* ---------- entrada ----------
+   La clase .anim la pone un script inline del <head> (solo si no se ha pedido
+   reducir el movimiento). Lo pintado en la mesa entra con CSS, desde el primer
+   pintado y sin esperar a ningún JS: son solo transform, nunca texto oculto,
+   para no retrasar el LCP. Los vasos caen también con CSS, pero esperan
+   ocultos a que el script (src/scripts/v.ts) ponga .lista: así van acompasados
+   con la pelota, que es lo único que mueve el script. */
+@media (prefers-reduced-motion: no-preference) {
+  .anim .borde {
+    animation: v-borde 0.7s var(--expo) both;
+  }
+  .anim .eje {
+    animation: v-eje 0.9s var(--expo) 0.05s both;
+  }
+  .anim .mitad.izq > span {
+    animation: v-izq 0.8s var(--expo) 0.08s both;
+  }
+  .anim .mitad.der > span {
+    animation: v-der 0.8s var(--expo) 0.08s both;
+  }
+  .anim .cuenta,
+  .anim .sin-fecha {
+    animation: v-caja 0.8s var(--expo) 0.12s both;
+  }
+  .anim .palabra,
+  .anim .num {
+    animation: v-sube 0.8s var(--expo) 0.16s both;
+  }
+
+  /* los vasos caen fila a fila (--t: el retraso de cada uno, en Vasos.astro) */
+  .anim.lista .copa {
+    animation: v-vaso 0.78s both;
+    animation-delay: var(--t, 0s);
+  }
+  .anim.lista .sombra {
+    animation: v-sombra 0.26s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
+    animation-delay: var(--t, 0s);
+  }
+
+  /* «fecha por confirmar» se escribe cuando el script pone .escrito */
+  .anim .pendiente {
+    clip-path: inset(-30% 100% -30% 0);
+  }
+  .anim.escrito .pendiente {
+    clip-path: inset(-30% 0% -30% 0);
+    transition: clip-path 0.5s ease-in-out;
+  }
+
+  /* el aviso del formulario se escribe de izquierda a derecha */
+  .sug-estado:not(:empty) {
+    animation: v-escribe 0.45s ease-in-out both;
+  }
+}
+
+.anim:not(.lista) .uve-vivo {
+  visibility: hidden;
+}
+
+@keyframes v-borde {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+@keyframes v-eje {
+  from {
+    transform: scaleY(0);
+  }
+}
+/* BEER | PONG sale del eje central hacia los lados (ya asomando: nunca oculto del todo) */
+@keyframes v-izq {
+  from {
+    transform: translateX(34%);
+  }
+}
+@keyframes v-der {
+  from {
+    transform: translateX(-34%);
+  }
+}
+@keyframes v-caja {
+  from {
+    transform: scale(1.04);
+  }
+}
+@keyframes v-sube {
+  from {
+    transform: translateY(16%);
+  }
+}
+/* el vaso cae (acelerando), se aplasta un pelo al tocar la mesa y se asienta */
+@keyframes v-vaso {
+  0% {
+    transform: translateY(-110px);
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  }
+  12% {
+    opacity: 1;
+  }
+  33.3% {
+    transform: translateY(0) scale(1.05, 0.9);
+    animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  52% {
+    transform: scale(0.985, 1.035);
+  }
+  70% {
+    transform: scale(1.008, 0.988);
+  }
+  86% {
+    transform: scale(0.998, 1.004);
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes v-sombra {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+@keyframes v-escribe {
+  from {
+    clip-path: inset(-30% 100% -30% 0);
+  }
+  to {
+    clip-path: inset(-30% 0% -30% 0);
+  }
+}

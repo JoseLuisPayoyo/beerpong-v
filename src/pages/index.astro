@@ -1,0 +1,158 @@
+---
+// La raíz: página de espera de la V edición («La mesa»).
+// Estática: sus propias fuentes y estilos, sin GSAP (un script mínimo mueve la pelota).
+// Referencia visual: reference/v/v-a.html.
+import '../styles/v.css';
+import Analytics from '@vercel/analytics/astro';
+import Vasos from '../components/v/Vasos.astro';
+import Sugerencia from '../components/v/Sugerencia.astro';
+import { FECHA_CONFIRMADA, FECHA_PROVISIONAL, FECHA_TORNEO, IV, SITIO, URL_IV, miles } from '../lib/v';
+
+// Fuentes self-hosteadas (solo el subconjunto latin, que cubre el español).
+import rotuloUrl from '@fontsource/big-shoulders-display/files/big-shoulders-display-latin-900-normal.woff2?url';
+import texto500Url from '@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-500-normal.woff2?url';
+import texto600Url from '@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-600-normal.woff2?url';
+import tizaUrl from '@fontsource/caveat-brush/files/caveat-brush-latin-400-normal.woff2?url';
+
+const cara = (familia: string, peso: number, url: string) =>
+  `@font-face{font-family:'${familia}';font-style:normal;font-weight:${peso};font-display:swap;src:url(${url}) format('woff2')}`;
+const fuentes = [
+  cara('Big Shoulders Display', 900, rotuloUrl),
+  cara('Bricolage Grotesque', 500, texto500Url),
+  cara('Bricolage Grotesque', 600, texto600Url),
+  cara('Caveat Brush', 400, tizaUrl),
+].join('');
+
+const titulo = 'Beerpong V · Agosto 2027 · Cabra del Santo Cristo';
+const descripcion =
+  'V edición del torneo de beer pong de El Pérez y Esos, en Cabra del Santo Cristo. Agosto de 2027, fecha por confirmar. Deja tu sugerencia para la quinta.';
+const og = `${SITIO}/og-v.jpg`;
+
+// «Jueves 5 de agosto de 2027, a las 18:00» (solo se muestra con la fecha confirmada)
+const cuando = new Date(FECHA_TORNEO);
+const dia = new Intl.DateTimeFormat('es-ES', { dateStyle: 'full', timeZone: 'Europe/Madrid' })
+  .format(cuando)
+  .replace(',', '');
+const hora = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' }).format(
+  cuando,
+);
+const fechaLarga = `${dia.charAt(0).toUpperCase()}${dia.slice(1)}, a las ${hora}`;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <script is:inline>
+      // Entrada animada: solo si no se ha pedido reducir el movimiento. La clase
+      // va antes del primer pintado para que nada parpadee. Si el script de la
+      // animación no llega en 4 s (mala cobertura), la página se muestra quieta.
+      (function () {
+        var d = document.documentElement;
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        d.classList.add('anim');
+        setTimeout(function () {
+          if (!d.classList.contains('lista')) d.classList.remove('anim');
+        }, 4000);
+      })();
+    </script>
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    <link rel="canonical" href={`${SITIO}/`} />
+    <meta name="theme-color" content="#0f5540" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Beerpong El Pérez y Esos" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:url" content={`${SITIO}/`} />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Beerpong, V edición: nueve vasos rojos formando una V sobre una mesa verde." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={titulo} />
+    <meta name="twitter:description" content={descripcion} />
+    <meta name="twitter:image" content={og} />
+
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- el rótulo es lo más grande de la primera pantalla: su fuente, cuanto antes -->
+    <link rel="preload" as="font" type="font/woff2" href={rotuloUrl} crossorigin />
+    <style is:inline set:html={fuentes}></style>
+  </head>
+  <body>
+    <div class="tablero">
+      <div class="lineas" aria-hidden="true"><span class="borde"></span><span class="eje"></span></div>
+
+      <main class="campo">
+        <div class="portada">
+          <p class="firma">El Pérez y Esos · Cabra del Santo Cristo</p>
+
+          <h1 class="titulo">
+            <span class="sr">Beerpong, V edición</span>
+            <span class="marca" aria-hidden="true">
+              <span class="mitad izq"><span>BEER</span></span>
+              <span class="mitad der"><span>PONG</span></span>
+            </span>
+            <Vasos />
+          </h1>
+
+          {
+            FECHA_CONFIRMADA ? (
+              <>
+                <div class="cuenta" id="cuenta" role="timer" aria-label="Cuenta atrás para el Beerpong V">
+                  <div class="celda">
+                    <span class="num" data-u="d">000</span>
+                    <span class="unidad">días</span>
+                  </div>
+                  <div class="celda">
+                    <span class="num" data-u="h">00</span>
+                    <span class="unidad">horas</span>
+                  </div>
+                  <div class="celda">
+                    <span class="num" data-u="m">00</span>
+                    <span class="unidad">min</span>
+                  </div>
+                  <div class="celda">
+                    <span class="num" data-u="s">00</span>
+                    <span class="unidad">seg</span>
+                  </div>
+                </div>
+                <p class="fecha">
+                  <time datetime={FECHA_TORNEO}>{fechaLarga}</time>
+                </p>
+              </>
+            ) : (
+              <p class="sin-fecha">
+                <span class="palabra">{FECHA_PROVISIONAL[0]}</span>
+                <span class="palabra">{FECHA_PROVISIONAL[1]}</span>
+                <span class="pendiente">fecha por confirmar</span>
+              </p>
+            )
+          }
+        </div>
+
+        <div class="banda">
+          <Sugerencia />
+
+          <a class="archivo" href={URL_IV}>
+            <b>Así fue la IV edición</b><br />
+            Campeones {IV.campeones}, {IV.final} en la final. {IV.equipos}&nbsp;equipos y {miles(IV.vasos)}&nbsp;vasos.
+          </a>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      import '../scripts/v.ts';
+    </script>
+    <!-- en el body (no en el head): su elemento propio cerraría el head antes de tiempo -->
+    <Analytics />
+  </body>
+</html>

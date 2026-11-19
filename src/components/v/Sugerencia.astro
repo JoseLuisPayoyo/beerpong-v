@@ -1,0 +1,99 @@
+---
+// «Deja una sugerencia para esta edición»: un textarea a tiza sobre la mesa.
+// Envía a POST /api/sugerencia (que guarda en Supabase desde el servidor).
+---
+
+<form class="sugerencia" id="sugerencia">
+  <label class="sug-titulo" for="sug-texto">Deja una sugerencia para esta edición</label>
+  <textarea
+    class="sug-texto"
+    id="sug-texto"
+    name="texto"
+    rows="3"
+    minlength="3"
+    maxlength="1000"
+    required
+    autocomplete="off"
+    placeholder="Más mesas, otra música, premio al mejor nombre…"></textarea>
+
+  <!-- Campo trampa para bots: una persona no lo ve ni llega a él con el teclado -->
+  <div class="trampa" aria-hidden="true">
+    <label for="sug-web">Web</label>
+    <input type="text" id="sug-web" name="web" tabindex="-1" autocomplete="off" aria-hidden="true" />
+  </div>
+
+  <p class="sug-estado" id="sug-estado" aria-live="polite"></p>
+  <button class="sug-enviar" id="sug-enviar" type="submit">ENVIAR SUGERENCIA</button>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#sugerencia');
+  const texto = document.querySelector<HTMLTextAreaElement>('#sug-texto');
+  const web = document.querySelector<HTMLInputElement>('#sug-web');
+  const estado = document.querySelector<HTMLElement>('#sug-estado');
+  const boton = document.querySelector<HTMLButtonElement>('#sug-enviar');
+
+  if (form && texto && web && estado && boton) {
+    const ROTULO = boton.textContent ?? 'ENVIAR SUGERENCIA';
+    let enviando = false;
+
+    // Vaciar y volver a escribir en el siguiente frame: así el lector de pantalla
+    // anuncia también un aviso repetido y la animación de la tiza vuelve a correr.
+    const avisar = (msg: string) => {
+      estado.textContent = '';
+      if (msg) requestAnimationFrame(() => (estado.textContent = msg));
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (enviando) return;
+
+      const valor = texto.value.trim();
+      if ([...valor].length < 3) {
+        avisar('Escribe tu idea antes de enviarla.');
+        texto.focus();
+        return;
+      }
+
+      enviando = true;
+      boton.disabled = true;
+      boton.textContent = 'Enviando…';
+      avisar('');
+
+      let ok = false;
+      let invalida = false;
+      try {
+        const r = await fetch('/api/sugerencia', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ texto: valor, web: web.value }),
+        });
+        const d = (await r.json().catch(() => null)) as { ok?: boolean } | null;
+        ok = r.ok && d?.ok === true;
+        invalida = r.status === 400;
+      } catch {
+        ok = false;
+      }
+
+      enviando = false;
+      boton.disabled = false;
+      boton.textContent = ROTULO;
+
+      if (ok) {
+        texto.value = '';
+        avisar('¡Recibida! Gracias.');
+      } else if (invalida) {
+        avisar('Escribe tu idea antes de enviarla.');
+        texto.focus();
+      } else {
+        // lo escrito se queda donde está
+        avisar('No se ha podido enviar. Prueba otra vez.');
+      }
+    });
+
+    // al seguir escribiendo, el aviso anterior se borra
+    texto.addEventListener('input', () => {
+      if (estado.textContent) estado.textContent = '';
+    });
+  }
+</script>
