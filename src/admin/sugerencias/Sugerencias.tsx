@@ -267,8 +267,8 @@ function Fila({ f, ahora, reciente, refEl, onEstado, onBorrar }: PropsFila) {
       >
         <div className="fila-cabeza">
           <span className={`insignia ${f.estado}`}>{ETIQUETA_ESTADO[f.estado]}</span>
-          <time className="fila-fecha" dateTime={f.created_at} title={fechaExacta(f.created_at)}>
-            {fechaRelativa(f.created_at, ahora)}
+          <time className="fila-fecha" dateTime={f.creada_en} title={fechaExacta(f.creada_en)}>
+            {fechaRelativa(f.creada_en, ahora)}
           </time>
         </div>
         <Texto id={idTexto} texto={f.texto} />

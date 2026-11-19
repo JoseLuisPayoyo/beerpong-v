@@ -10,17 +10,17 @@ import { sb, mensajeError } from '../supabase';
 import { avisar } from '../avisar';
 
 export type EstadoSug = 'nueva' | 'leida' | 'archivada';
-export type Id = string | number;
+export type Id = number; // bigint en la tabla
 export interface Sugerencia {
   id: Id;
   texto: string;
   estado: EstadoSug;
-  created_at: string;
+  creada_en: string;
 }
 
 // Columnas que lee el panel (si en la tabla se llaman de otra forma, es aquí).
 const TABLA = 'sugerencias';
-const COLUMNAS = 'id, texto, estado, created_at';
+const COLUMNAS = 'id, texto, estado, creada_en';
 // Cuánto dura el resaltado de una sugerencia recién llegada.
 const RESALTE_MS = 4000;
 
@@ -70,8 +70,9 @@ export function useNuevas(): number | null {
 
 type Cambio = RealtimePostgresChangesPayload<Sugerencia>;
 
-const masNuevaPrimero = (a: Sugerencia, b: Sugerencia) =>
-  a.created_at < b.created_at ? 1 : a.created_at > b.created_at ? -1 : 0;
+// Por fecha real, no por texto: la API y Realtime pueden escribir la misma
+// hora con distinto formato («Z» o «+00:00»).
+const masNuevaPrimero = (a: Sugerencia, b: Sugerencia) => Date.parse(b.creada_en) - Date.parse(a.creada_en);
 
 function aplicar(filas: Sugerencia[], c: Cambio): Sugerencia[] {
   if (c.eventType === 'DELETE') {
@@ -117,7 +118,7 @@ export async function cargar(): Promise<void> {
   const { data, error } = await sb()
     .from(TABLA)
     .select(COLUMNAS)
-    .order('created_at', { ascending: false });
+    .order('creada_en', { ascending: false });
 
   if (mio !== turno) return; // ha empezado otra carga después: manda esa
   const cola = pendientes ?? [];
